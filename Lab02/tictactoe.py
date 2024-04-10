@@ -1,11 +1,20 @@
-'''
+"""
 Created on Jan 31, 2021
 
 @author: Aaron Cass
-'''
+"""
 
 BLANK = ' '
 BOARD_SIZE = 3
+
+
+def __read_board_from_file(filename):
+    board_file = open(filename)
+    board_lines = board_file.read()
+    board_file.close()
+
+    return board_lines.split('\n')
+
 
 def create_board(list_of_rows):
     """
@@ -14,7 +23,7 @@ def create_board(list_of_rows):
     :param list_of_rows: a list of the rows (as strings) that make
     up the initial contents of board. Extra rows and columns
     beyond the standard board size are ignored.
-    :return: a tic tac toe board representation
+    :return: a tic_tac_toe board representation
     """
     result = list()
     for row in range(BOARD_SIZE):
@@ -28,43 +37,49 @@ def create_board(list_of_rows):
 
     return result
 
+
 def get_piece(board, row, column):
     """
     Finds and returns the piece that appears at a give row and column.
 
-    :param board: A tic tac toe board
+    :param board: A tic_tac_toe board
     :param row: The given row
     :param column: The given column
     :return: The piece that appears at the given row and column.
     """
     return board[row][column]
-        
+
+
 def __three_in_row(board, player, start_x, start_y, dx, dy):
     """
     Determines if a player has three in a row, starting
     from a starting position (start_x, start_y) and going
     in the direction indicated by (dx, dy).
     """
-    x = start_x; y = start_y
+    x = start_x
+    y = start_y
     for i in range(BOARD_SIZE):
         if get_piece(board, y, x) != player:
             return False
-        x += dx; y += dy
+        x += dx
+        y += dy
 
     return True
-    
+
+
 def __is_winner(board, player):
     """
     :return: True if and only if the given player has won on the given board
     """
     for i in range(BOARD_SIZE):
-        if (__three_in_row(board, player, 0, i, 1, 0) 
-            or __three_in_row(board, player, i, 0, 0, 1)):
+        if (__three_in_row(board, player, 0, i, 1, 0)
+                or __three_in_row(board, player, i, 0, 0, 1)):
             return True
 
     return (__three_in_row(board, player, 0, 0, 1, 1)
             or __three_in_row(board, player, 0, BOARD_SIZE - 1, 1, -1)
             )
+
 
 def get_winner(board):
     """
@@ -72,7 +87,7 @@ def get_winner(board):
     intended to be called in the course of a normal game, in which
     case there can be only one winner (or no winner).
 
-    :param board: The tic tac toe board.
+    :param board: The tic_tac_toe board.
     :return: the name of the winner, or None if there is no winner
     """
     if __is_winner(board, 'X'):
@@ -81,7 +96,8 @@ def get_winner(board):
         return 'O'
     else:
         return None
-                
+
+
 def board_string(board):
     """
     :param board:
@@ -89,11 +105,12 @@ def board_string(board):
     """
     str = ""
     for row_num in range(BOARD_SIZE - 1):
-        str += __row_string(board, row_num) +"\n"
+        str += __row_string(board, row_num) + "\n"
         str += "----------\n"
 
     str += __row_string(board, BOARD_SIZE - 1)
     return str
+
 
 def __row_string(board, row_num):
     result = ''
@@ -101,4 +118,3 @@ def __row_string(board, row_num):
         result += get_piece(board, row_num, col_num) + ' | '
     result += get_piece(board, row_num, BOARD_SIZE - 1)
     return result
-    
