@@ -1,131 +1,133 @@
 import random
 
-SMALLEST_CARD_NUMBER = 2
-BIGGEST_CARD_NUMBER = 10
-NUM_CARDS_IN_HAND = 5
-NUM_ROUNDS = 10
-
-
 class CardDeck:
+    """
+    Represents a deck of playing cards ranging from 2 to Ace, across four suits.
+    The deck is shuffled upon initialization.
+    """
+
+    _SMALLEST_CARD_NUMBER = 2
+    _BIGGEST_CARD_NUMBER = 10
+    _NUM_CARDS_IN_HAND = 5
+
     def __init__(self):
         """
-        Initializes a new deck of cards, consisting of ranks 2 to Ace across four suits.
-        The deck is immediately shuffled after creation.
+        Initializes a new deck of cards and shuffles it.
         """
-        self.suits = ['C', 'D', 'H', 'S']
-        self.ranks = [str(i) for i in range(SMALLEST_CARD_NUMBER, BIGGEST_CARD_NUMBER + 1)]
-        self.ranks.extend(['J', 'Q', 'K', 'Ace'])
-        self.deck = self.create_deck()
-        self.shuffle_deck()
+        self._suits = ['C', 'D', 'H', 'S']
+        self._ranks = [str(i) for i in range(self._SMALLEST_CARD_NUMBER, self._BIGGEST_CARD_NUMBER + 1)]
+        self._ranks.extend(['J', 'Q', 'K', 'Ace'])
+        self._deck = self._create_deck()
+        self._shuffle_deck()
 
-    def create_deck(self):
+    def _create_deck(self):
         """
-        Generates a list of card dictionaries where each card is represented by a dictionary
-        with 'Rank' and 'Suit' as keys.
+        Creates a full deck of cards as a list of dictionaries where each card has a 'Rank' and 'Suit'.
 
-        Returns:
-            list of dicts: The list of cards forming a complete deck.
+        :return: List of dicts representing the full deck of cards.
         """
-        return [{'Rank': rank, 'Suit': suit} for suit in self.suits for rank in self.ranks]
+        return [{'Rank': rank, 'Suit': suit} for suit in self._suits for rank in self._ranks]
 
-    def shuffle_deck(self):
+    def _shuffle_deck(self):
         """
-        Shuffles the deck in place using Python's random.shuffle method.
+        Shuffles the deck of cards in place.
         """
-        random.shuffle(self.deck)
+        random.shuffle(self._deck)
 
     def deal_hand(self):
         """
-        Deals a hand of 5 cards from the current deck. If the deck runs out of cards,
-        it is re-created and re-shuffled.
+        Deals a hand of cards from the deck. If the deck is exhausted, it is recreated and reshuffled.
 
-        Returns:
-            list of dicts: A list of card dictionaries representing a hand.
+        :return: List of dicts representing a hand of cards.
         """
         hand = []
-        while len(self.deck) > 0 and len(hand) < NUM_CARDS_IN_HAND:
-            hand.append(self.deck.pop())
-            if not self.deck:
-                self.deck = self.create_deck()
-                self.shuffle_deck()
+        while len(self._deck) > 0 and len(hand) < self._NUM_CARDS_IN_HAND:
+            hand.append(self._deck.pop())
+            if not self._deck:
+                self._deck = self._create_deck()
+                self._shuffle_deck()
         return hand
 
+    def check_flush(self, hand):
+        """
+        Determines if a hand is a flush (all cards of the same suit).
 
-def check_flush(hand):
+        :param hand: List of dicts representing a hand of cards.
+        :return: True if the hand is a flush, False otherwise.
+        """
+        return len(set(card['Suit'] for card in hand)) == 1
+
+    def check_pair(self, hand):
+        """
+        Counts the number of pairs in a hand.
+
+        :param hand: List of dicts representing a hand of cards.
+        :return: The number of pairs in the hand.
+        """
+        ranks = [card['Rank'] for card in hand]
+        count = {}
+        # If the rank is not already a key in the dictionary,
+        # it initializes its count to 0 using count.get(rank, 0).
+        # Then, it increments the count for that rank by 1.
+        for rank in ranks:
+            count[rank] = count.get(rank, 0) + 1
+        return sum(1 for v in count.values() if v >= 2)
+
+
+class PokerGame:
     """
-    Determines if a hand of cards is a flush (all cards of the same suit).
-
-    Args:
-        hand (list of dicts): The hand to check.
-
-    Returns:
-        bool: True if the hand is a flush, False otherwise.
+    Manages the gameplay for multiple rounds of a poker game, tallying occurrences of hand outcomes.
     """
-    return len(set(card['Suit'] for card in hand)) == 1
 
+    _NUM_ROUNDS = 10
+    _TOTAL_HANDS_IN_ROUND = 10000
 
-def check_pair(hand):
-    """
-    Counts the number of pairs in a hand. A pair is two cards of the same rank.
+    def __init__(self):
+        """
+        Initializes a new poker game with a deck of cards.
+        """
+        self._card_deck = CardDeck()
 
-    Args:
-        hand (list of dicts): The hand to check.
+    def play_rounds(self):
+        """
+        Plays a specified number of rounds, dealing hands and counting hand outcomes. Outputs results periodically.
+        """
+        print('{:>10} {:>11} {:>3} {:>13} {:>3} {:>12} {:>3} {:>14} {:>3}'.format(
+            '# of hands', 'pairs', '%', '2 pairs', '%', 'flushes', '%', 'high card', '%'))
+        results = {"pairs": 0, "two_pairs": 0, "flushes": 0, "high_cards": 0}
+        total_hands = 0
 
-    Returns:
-        int: The number of pairs in the hand.
-    """
-    ranks = [card['Rank'] for card in hand]
-    count = {}
-    for rank in ranks:
-        count[rank] = count.get(rank, 0) + 1
-    pairs = sum(1 for v in count.values() if v >= 2)
-    return pairs
+        for _ in range(self._NUM_ROUNDS):
+            for _ in range(self._TOTAL_HANDS_IN_ROUND):
+                hand = self._card_deck.deal_hand()
+                num_pairs = self._card_deck.check_pair(hand)
+                if self._card_deck.check_flush(hand):
+                    results["flushes"] += 1
+                elif num_pairs == 1:
+                    results["pairs"] += 1
+                elif num_pairs == 2:
+                    results["two_pairs"] += 1
+                else:
+                    results["high_cards"] += 1
 
+            total_hands += self._TOTAL_HANDS_IN_ROUND
+            self._output_results(total_hands, results)
 
-def play_rounds():
-    """
-    Simulates the dealing of hands and counts the occurrences of different hand kinds
-    over a number of rounds. Results are printed in a formatted table.
-    """
-    print('{:>10} {:>11} {:>3} {:>13} {:>3} {:>12} {:>3} {:>14} {:>3}'.format(
-        '# of hands', 'pairs', '%', '2 pairs', '%', 'flushes', '%', 'high card', '%'))
+    def _output_results(self, total_hands, results):
+        """
+        Outputs the accumulated results of the poker game in a formatted manner.
 
-    card_deck = CardDeck()
-    total_hands = 0
-    results = {"pairs": 0, "two_pairs": 0, "flushes": 0, "high_cards": 0}
-
-    for _ in range(NUM_ROUNDS):
-        for _ in range(10000):
-            hand = card_deck.deal_hand()
-            num_pairs = check_pair(hand)
-            if check_flush(hand):
-                results["flushes"] += 1
-            elif num_pairs == 1:
-                results["pairs"] += 1
-            elif num_pairs == 2:
-                results["two_pairs"] += 1
-            else:
-                results["high_cards"] += 1
-
-        total_hands += 10000
-        output_results(total_hands, results)
-
-
-def output_results(total_hands, results):
-    """
-    Prints a formatted row of results for the current total of hands and their outcomes.
-
-    Args:
-        total_hands (int): Total number of hands dealt so far.
-        results (dict): Dictionary containing the counts of each hand type.
-    """
-    print('{:>10,} {:>11d} {:>05.2f} {:>11d} {:>05.2f} {:>10d} {:>05.2f} {:>12d} {:>05.2f}'.format(
-        total_hands,
-        results["pairs"], (results["pairs"] / total_hands * 100),
-        results["two_pairs"], (results["two_pairs"] / total_hands * 100),
-        results["flushes"], (results["flushes"] / total_hands * 100),
-        results["high_cards"], (results["high_cards"] / total_hands * 100)))
+        :param total_hands: Integer representing the total number of hands dealt so far.
+        :param results: Dictionary containing counts of various hand types.
+        """
+        print('{:>10,} {:>11d} {:>05.2f} {:>11d} {:>05.2f} {:>10d} {:>05.2f} {:>12d} {:>05.2f}'.format(
+            total_hands,
+            results["pairs"], (results["pairs"] / total_hands * 100),
+            results["two_pairs"], (results["two_pairs"] / total_hands * 100),
+            results["flushes"], (results["flushes"] / total_hands * 100),
+            results["high_cards"], (results["high_cards"] / total_hands * 100)))
 
 
 if __name__ == "__main__":
-    play_rounds()
+    game = PokerGame()
+    game.play_rounds()

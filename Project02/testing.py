@@ -12,7 +12,7 @@ class TestSuite:
 
     def set_verbose(self, verbose):
         """
-        Sets ther verbosity of this test suite. If the verbosity is False,
+        Sets the verbosity of this test suite. If the verbosity is False,
         then details are only printed for test cases that fail. If the
         verbosity is True, then details are printed for all tests.
 
@@ -56,14 +56,13 @@ class TestSuite:
         print("%d/%d tests failed (%.1f%%)" % (self.__fails, total, percent_fail))
         print("---------------")
 
-
     def __print_details(self, msg, actual, expected):
         print(msg)
         print(f"actual: {actual}")
         print(f"expected: {expected}")
         
     def __pass(self, msg, actual, expected):
-        if (self.__verbose):
+        if self.__verbose:
             self.__print_details(msg, actual, expected)
             print("PASS")
         self.__passes += 1
@@ -73,4 +72,3 @@ class TestSuite:
         print("FAIL")
 
         self.__fails += 1
-

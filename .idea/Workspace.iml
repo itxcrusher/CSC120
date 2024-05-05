@@ -8,6 +8,8 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="Lab03" />
     <orderEntry type="module" module-name="Lab04" />
+    <orderEntry type="module" module-name="Project02" />
+    <orderEntry type="module" module-name="Lab05" />
   </component>
   <component name="PyDocumentationSettings">
     <option name="format" value="PLAIN" />
