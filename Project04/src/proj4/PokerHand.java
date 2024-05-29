@@ -1,4 +1,4 @@
-package proj3; // do not erase. Gradescope expects this.
+package proj4;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,7 +10,6 @@ import java.util.HashMap;
  */
 public class PokerHand implements Comparable<PokerHand> {
 
-    // Constants
     private static final int START_INDEX = 0;
     private static final int HAND_SIZE = 5;
     private static final int RANK_HIGH_CARD = 0;
@@ -53,7 +52,7 @@ public class PokerHand implements Comparable<PokerHand> {
      * @param index The index of the card to return (0-based).
      * @return The card at the specified index, or null if the index is invalid.
      */
-    public Card getCard(int index) {
+    public Card getIthCard(int index) {
         if (index >= START_INDEX && index < hand.size()) {
             return hand.get(index);
         }
