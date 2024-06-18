@@ -14,6 +14,7 @@ public class SimonSaysGame
 
     public void playGame()
     {
+        MINI FIGURE
         StringProcessor sp = new StringProcessor();
 		
         System.out.println(phrase);
